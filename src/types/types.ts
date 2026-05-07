@@ -16,6 +16,7 @@ export type CreateSessionParams = {
   projectId?: string;
   modelName?: string;
   modelApiKey?: string;
+  modelBaseUrl?: string;
   browserbaseSessionID?: string;
   browserbaseSessionCreateParams?: any;
   meta?: Record<string, any>;

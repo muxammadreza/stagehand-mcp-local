@@ -34,11 +34,17 @@ export const configSchema = z
       .boolean()
       .optional()
       .describe("Whether or not to use Browserbase proxies"),
+    verified: z
+      .boolean()
+      .optional()
+      .describe(
+        "Use Browserbase Verified Identity. Only available to Browserbase Scale Plan users",
+      ),
     advancedStealth: z
       .boolean()
       .optional()
       .describe(
-        "Use advanced stealth mode. Only available to Browserbase Scale Plan users",
+        "Deprecated alias for verified",
       ),
     keepAlive: z
       .boolean()
@@ -85,35 +91,26 @@ export const configSchema = z
     modelName: z
       .string()
       .optional()
-      .describe("The model to use for Stagehand (default: gemini-2.0-flash)"),
+      .describe(
+        "The model to use for Stagehand (default: google/gemini-2.5-flash-lite)",
+      ),
     modelApiKey: z
       .string()
       .optional()
       .describe(
-        "API key for the custom model provider. Required when using a model other than the default gemini-2.0-flash",
+        "API key for the model provider. Optional for providers/local setups that do not require a key",
+      ),
+    modelBaseUrl: z
+      .string()
+      .optional()
+      .describe(
+        "Base URL for model providers that support custom endpoints (for example local OpenAI-compatible models)",
       ),
     experimental: z
       .boolean()
       .optional()
       .describe("Enable experimental Stagehand features"),
-  })
-  .refine(
-    (data) => {
-      // If a non-default model is explicitly specified, API key is required
-      if (data.modelName && data.modelName !== "gemini-2.0-flash") {
-        return (
-          data.modelApiKey !== undefined &&
-          typeof data.modelApiKey === "string" &&
-          data.modelApiKey.length > 0
-        );
-      }
-      return true;
-    },
-    {
-      message: "modelApiKey is required when specifying a custom model",
-      path: ["modelApiKey"],
-    },
-  );
+  });
 
 // Default function for Smithery
 export default function ({ config }: { config: z.infer<typeof configSchema> }) {
@@ -133,14 +130,7 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
     name: "Browserbase MCP Server",
     version: "2.3.0",
     description:
-      "Cloud browser automation server powered by Browserbase and Stagehand. Enables LLMs to navigate websites, interact with elements, extract data, and capture screenshots using natural language commands.",
-    capabilities: {
-      resources: {
-        subscribe: true,
-        listChanged: true,
-      },
-      tools: {},
-    },
+      "Browser automation server powered by Browserbase and Stagehand. Supports Browserbase cloud and LOCAL execution.",
   });
 
   const internalConfig: Config = {

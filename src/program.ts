@@ -36,8 +36,12 @@ program
   .option("--browserbaseProjectId <id>", "The Browserbase Project ID to use")
   .option("--proxies", "Use Browserbase proxies.")
   .option(
+    "--verified",
+    "Use Browserbase Verified Identity. Only available to Browserbase Scale Plan users.",
+  )
+  .option(
     "--advancedStealth",
-    "Use advanced stealth mode. Only available to Browserbase Scale Plan users.",
+    "Deprecated alias for --verified.",
   )
   .option("--contextId <contextId>", "Browserbase Context ID to use.")
   .option(
@@ -54,11 +58,15 @@ program
   .option("--browserHeight <height>", "Browser height to use for the browser.")
   .option(
     "--modelName <model>",
-    "The model to use for Stagehand (default: gemini-2.0-flash)",
+    "The model to use for Stagehand (default: google/gemini-2.5-flash-lite)",
   )
   .option(
     "--modelApiKey <key>",
-    "API key for the custom model provider (required when using custom models)",
+    "API key for the model provider (optional for local/custom providers that do not require a key)",
+  )
+  .option(
+    "--modelBaseUrl <url>",
+    "Base URL for model providers that support custom endpoints (for example local OpenAI-compatible models)",
   )
   .option("--keepAlive", "Enable Browserbase Keep Alive Session")
   .option("--experimental", "Enable experimental features")

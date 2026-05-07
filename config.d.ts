@@ -49,7 +49,14 @@ export type Config = {
    */
   proxies?: boolean;
   /**
+   * Use Browserbase Verified Identity. Only available to Browserbase Scale Plan users.
+   *
+   * @default false
+   */
+  verified?: boolean;
+  /**
    * Use advanced stealth mode. Only available to Browserbase Scale Plan users.
+   * Deprecated alias for verified.
    *
    * @default false
    */
@@ -122,14 +129,18 @@ export type Config = {
    * The Model that Stagehand uses
    * Available models: OpenAI, Claude, Gemini, Cerebras, Groq, and other providers
    *
-   * @default "gemini-2.0-flash"
+   * @default "google/gemini-2.5-flash-lite"
    */
   modelName?: z.infer<typeof AvailableModelSchema>;
   /**
-   * API key for the custom model provider
-   * Required when using a model other than the default gemini-2.0-flash
+   * API key for the configured model provider.
+   * Optional when using providers/local setups that do not require an API key.
    */
   modelApiKey?: string;
+  /**
+   * Base URL for model providers that support custom endpoints (for example OpenAI-compatible local models).
+   */
+  modelBaseUrl?: string;
   /**
    * Enable experimental features
    *

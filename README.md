@@ -86,6 +86,8 @@ pnpm build
 | Variable | Description | Default | Required |
 |----------|-------------|---------|----------|
 | `STAGEHAND_ENV` | Set to `LOCAL` for local mode | `BROWSERBASE` | **Yes** |
+| `MODEL_API_KEY` | Generic model API key override | - | Optional |
+| `MODEL_BASE_URL` | Custom model endpoint (OpenAI-compatible/local models) | - | Optional |
 | `OPENAI_API_KEY` | OpenAI API key | - | One of these |
 | `GEMINI_API_KEY` | Google Gemini API key | - | is required |
 | `ANTHROPIC_API_KEY` | Anthropic API key | - | for Stagehand |
@@ -105,8 +107,19 @@ npx stagehand-mcp-local --browserWidth 1920 --browserHeight 1080 --experimental
 |------|-------------|
 | `--browserWidth <width>` | Browser viewport width (default: 1024) |
 | `--browserHeight <height>` | Browser viewport height (default: 768) |
-| `--modelName <model>` | LLM model for Stagehand (default: gemini-2.0-flash) |
+| `--modelName <model>` | LLM model for Stagehand (default: `google/gemini-2.5-flash-lite`) |
+| `--modelApiKey <key>` | API key for model provider (optional for local/custom setups) |
+| `--modelBaseUrl <url>` | Base URL for custom/local OpenAI-compatible model endpoints |
 | `--experimental` | Enable experimental Stagehand features |
+
+### Local Model Example (Ollama / OpenAI-compatible)
+
+```bash
+STAGEHAND_ENV=LOCAL \
+MODEL_BASE_URL=http://localhost:11434/v1 \
+MODEL_API_KEY=dummy \
+npx stagehand-mcp-local --modelName openai/qwen2.5-coder:7b
+```
 
 ## Available MCP Tools
 

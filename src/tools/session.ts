@@ -76,6 +76,17 @@ async function handleCreateSession(
 
       // Note: No need to set context.currentSessionId - SessionManager handles this
       // and context.currentSessionId is a getter that delegates to SessionManager
+      if (config.env === "LOCAL") {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `LOCAL session created and set active: ${targetSessionId}`,
+            },
+          ],
+        };
+      }
+
       const bb = new Browserbase({
         apiKey: config.browserbaseApiKey,
       });

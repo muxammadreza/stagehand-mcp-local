@@ -23,13 +23,31 @@ export const createStagehandInstance = async (
     throw new Error("Browserbase API Key and Project ID are required for BROWSERBASE mode");
   }
 
-  const modelName = params.modelName || config.modelName || "gemini-2.0-flash";
+  const modelName =
+    params.modelName || config.modelName || "google/gemini-2.5-flash-lite";
   const modelApiKey =
+    params.modelApiKey ||
     config.modelApiKey ||
+    process.env.MODEL_API_KEY ||
     process.env.GEMINI_API_KEY ||
     process.env.GOOGLE_API_KEY ||
     process.env.OPENAI_API_KEY ||
     process.env.ANTHROPIC_API_KEY;
+  const modelBaseUrl =
+    params.modelBaseUrl ||
+    config.modelBaseUrl ||
+    process.env.MODEL_BASE_URL ||
+    process.env.OPENAI_BASE_URL ||
+    process.env.ANTHROPIC_BASE_URL;
+
+  const modelConfig =
+    modelApiKey || modelBaseUrl
+      ? {
+          modelName,
+          ...(modelApiKey ? { apiKey: modelApiKey } : {}),
+          ...(modelBaseUrl ? { baseURL: modelBaseUrl } : {}),
+        }
+      : modelName;
 
   let stagehand: Stagehand;
 
@@ -39,12 +57,7 @@ export const createStagehandInstance = async (
 
     stagehand = new Stagehand({
       env: "LOCAL",
-      model: modelApiKey
-        ? {
-            apiKey: modelApiKey,
-            modelName: modelName,
-          }
-        : modelName,
+      model: modelConfig,
       experimental: config.experimental ?? false,
       localBrowserLaunchOptions: {
         headless: config.localBrowserLaunchOptions?.headless ?? true,
@@ -65,12 +78,7 @@ export const createStagehandInstance = async (
       env: "BROWSERBASE",
       apiKey,
       projectId,
-      model: modelApiKey
-        ? {
-            apiKey: modelApiKey,
-            modelName: modelName,
-          }
-        : modelName,
+      model: modelConfig,
       ...(params.browserbaseSessionID && {
         browserbaseSessionID: params.browserbaseSessionID,
       }),
@@ -90,7 +98,8 @@ export const createStagehandInstance = async (
                 persist: config.context?.persist ?? true,
               }
             : undefined,
-          advancedStealth: config.advancedStealth ?? undefined,
+          verified:
+            config.verified ?? config.advancedStealth ?? undefined,
         },
         userMetadata: {
           mcp: "true",

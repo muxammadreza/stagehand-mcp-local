@@ -5,6 +5,7 @@ export type ToolCapability = "core" | string;
 // Define Command Line Options Structure
 export type CLIOptions = {
   proxies?: boolean;
+  verified?: boolean;
   advancedStealth?: boolean;
   contextId?: string;
   persist?: boolean;
@@ -14,6 +15,7 @@ export type CLIOptions = {
   browserHeight?: number;
   modelName?: string;
   modelApiKey?: string;
+  modelBaseUrl?: string;
   keepAlive?: boolean;
   experimental?: boolean;
 };
@@ -35,7 +37,7 @@ const defaultConfig: Config = {
     browserWidth: 1024,
     browserHeight: 768,
   },
-  modelName: "gemini-2.0-flash", // Default Model
+  modelName: "google/gemini-2.5-flash-lite",
   // LOCAL mode specific config
   screenshot: {
     enabled: process.env.SCREENSHOT_ENABLED !== "false",
@@ -57,10 +59,18 @@ export async function resolveConfig(cliOptions: CLIOptions): Promise<Config> {
   // --- Add Model API Key from Env Vars ---
   if (!mergedConfig.modelApiKey) {
     mergedConfig.modelApiKey =
+      process.env.MODEL_API_KEY ||
       process.env.GEMINI_API_KEY ||
       process.env.GOOGLE_API_KEY ||
       process.env.OPENAI_API_KEY ||
       process.env.ANTHROPIC_API_KEY;
+  }
+
+  if (!mergedConfig.modelBaseUrl) {
+    mergedConfig.modelBaseUrl =
+      process.env.MODEL_BASE_URL ||
+      process.env.OPENAI_BASE_URL ||
+      process.env.ANTHROPIC_BASE_URL;
   }
 
   // --------------------------------
@@ -83,13 +93,6 @@ export async function resolveConfig(cliOptions: CLIOptions): Promise<Config> {
     console.log("[Config] Running in LOCAL mode - Browserbase credentials not required");
   }
 
-  if (!mergedConfig.modelApiKey) {
-    console.warn(
-      "Warning: MODEL_API_KEY environment variable not set. Using dummy value.",
-    );
-    mergedConfig.modelApiKey = "dummy-api-key";
-  }
-
   return mergedConfig;
 }
 
@@ -105,6 +108,7 @@ export async function configFromCLIOptions(
       host: cliOptions.host,
     },
     proxies: cliOptions.proxies,
+    verified: cliOptions.verified ?? cliOptions.advancedStealth,
     context: {
       contextId: cliOptions.contextId,
       persist: cliOptions.persist,
@@ -113,9 +117,10 @@ export async function configFromCLIOptions(
       browserWidth: cliOptions.browserWidth,
       browserHeight: cliOptions.browserHeight,
     },
-    advancedStealth: cliOptions.advancedStealth,
+    advancedStealth: cliOptions.advancedStealth ?? cliOptions.verified,
     modelName: cliOptions.modelName,
     modelApiKey: cliOptions.modelApiKey,
+    modelBaseUrl: cliOptions.modelBaseUrl,
     keepAlive: cliOptions.keepAlive,
     experimental: cliOptions.experimental,
   };
